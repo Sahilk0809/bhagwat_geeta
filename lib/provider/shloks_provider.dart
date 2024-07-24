@@ -15,6 +15,7 @@ class GitaProvider extends ChangeNotifier {
           (e) => GitaModal.fromJson(e),
         )
         .toList();
+    notifyListeners();
   }
 
   GitaProvider(){

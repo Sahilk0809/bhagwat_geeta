@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../../utils/global.dart';
+import '../../detail_screen/provider/detail_screen_provider.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -18,6 +19,10 @@ class HomeScreen extends StatelessWidget {
     var homeScreenProvideTrue =
         Provider.of<HomeScreenProvider>(context, listen: true);
     var gitaProvider = Provider.of<GitaProvider>(context);
+    var detailScreenProviderTrue =
+        Provider.of<DetailScreenProvider>(context, listen: true);
+    var detailScreenProviderFalse =
+        Provider.of<DetailScreenProvider>(context, listen: false);
     var height = MediaQuery.of(context).size.height;
     var width = MediaQuery.of(context).size.width;
     return Scaffold(
@@ -29,23 +34,28 @@ class HomeScreen extends StatelessWidget {
           Icons.account_circle_outlined,
           size: 30,
         ),
-        title: Text(translate[homeScreenProvideTrue.languageIndex]),
+        title: Text(
+          (detailScreenProviderTrue.selectedLanguage == 'Sanskrit')
+              ? translate[0]
+              : (detailScreenProviderTrue.selectedLanguage == 'Hindi')
+                  ? translate[1]
+                  : (detailScreenProviderTrue.selectedLanguage == 'English')
+                      ? translate[2]
+                      : translate[3],
+        ),
         actions: [
-          Padding(
-            padding: const EdgeInsets.only(
-              right: 15.0,
-            ),
-            child: Consumer<HomeScreenProvider>(
-              builder: (context, value, child) => InkWell(
-                onTap: () {
-                  homeScreenProviderFalse.translateLanguage();
-                },
-                child: const Icon(
-                  Icons.translate,
-                  size: 30,
-                ),
-              ),
-            ),
+          DropdownButton(
+            value: detailScreenProviderTrue.selectedLanguage,
+            onChanged: (String? value) {
+              detailScreenProviderFalse.languageTranslate(value!);
+            },
+            items: <String>['Sanskrit', 'Hindi', 'English', 'Gujarati']
+                .map<DropdownMenuItem<String>>((String value) {
+              return DropdownMenuItem<String>(
+                value: value,
+                child: Text(value),
+              );
+            }).toList(),
           ),
         ],
       ),
@@ -55,7 +65,7 @@ class HomeScreen extends StatelessWidget {
         decoration: const BoxDecoration(
           image: DecorationImage(
             fit: BoxFit.cover,
-            image: AssetImage('assets/img/gita.jpg'),
+            image: AssetImage('assets/img/gita2.jpg'),
           ),
         ),
         child: SingleChildScrollView(
@@ -76,6 +86,7 @@ class HomeScreen extends StatelessWidget {
                       gitaProvider: gitaProvider,
                       index: index,
                       homeScreenProviderTrue: homeScreenProvideTrue,
+                      detailScreenProviderTrue: detailScreenProviderTrue,
                     ),
                   ),
                 ),
@@ -87,31 +98,33 @@ class HomeScreen extends StatelessWidget {
     );
   }
 
-  Container adhyayContainer({
-    required double height,
-    required double width,
-    required GitaProvider gitaProvider,
-    required int index,
-    required HomeScreenProvider homeScreenProviderTrue,
-  }) {
+  Container adhyayContainer(
+      {required double height,
+      required double width,
+      required GitaProvider gitaProvider,
+      required int index,
+      required HomeScreenProvider homeScreenProviderTrue,
+      required DetailScreenProvider detailScreenProviderTrue}) {
     return Container(
       alignment: Alignment.center,
       margin: const EdgeInsets.fromLTRB(10, 10, 10, 10),
-      padding: const EdgeInsets.all(10),
-      height: height * 0.12,
+      padding: const EdgeInsets.all(30),
+      // height: height * 0.12,
       width: width * 0.95,
       decoration: BoxDecoration(
         color: color1,
         borderRadius: BorderRadius.circular(10),
       ),
       child: Text(
-        (homeScreenProviderTrue.languageIndex == 0)
+        (detailScreenProviderTrue.selectedLanguage == 'Sanskrit')
             ? gitaProvider.gitaModalList[index].chapterName.sanskrit
-            : (homeScreenProviderTrue.languageIndex == 1)
+            : (detailScreenProviderTrue.selectedLanguage == 'Hindi')
                 ? gitaProvider.gitaModalList[index].chapterName.hindi
-                : (homeScreenProviderTrue.languageIndex == 2)
-                    ? gitaProvider.gitaModalList[index].chapterName.english
-                    : gitaProvider.gitaModalList[index].chapterName.gujarati,
+                : (detailScreenProviderTrue.selectedLanguage == 'English')
+                    ? gitaProvider
+                        .gitaModalList[index].chapterName.english
+                    : gitaProvider
+                        .gitaModalList[index].chapterName.gujarati,
         style: const TextStyle(
           color: Colors.white,
           fontWeight: FontWeight.bold,

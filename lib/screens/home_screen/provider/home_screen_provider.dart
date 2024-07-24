@@ -1,4 +1,3 @@
-import 'package:bhagwat_geeta/provider/shloks_provider.dart';
 import 'package:flutter/material.dart';
 
 class HomeScreenProvider extends ChangeNotifier{

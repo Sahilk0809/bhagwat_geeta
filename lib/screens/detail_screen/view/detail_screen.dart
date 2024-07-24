@@ -1,5 +1,7 @@
 import 'dart:io';
+import 'dart:math';
 import 'dart:typed_data';
+import 'package:bhagwat_geeta/screens/detail_screen/provider/detail_screen_provider.dart';
 import 'package:bhagwat_geeta/utils/colors.dart';
 import 'package:clipboard/clipboard.dart';
 import 'package:flutter/material.dart';
@@ -8,10 +10,10 @@ import 'package:image_gallery_saver/image_gallery_saver.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:share_extend/share_extend.dart';
-import '../../provider/shloks_provider.dart';
-import '../../utils/global.dart';
-import '../home_screen/provider/home_screen_provider.dart';
-import '../home_screen/view/home_screen.dart';
+import '../../../provider/shloks_provider.dart';
+import '../../../utils/global.dart';
+import '../../home_screen/provider/home_screen_provider.dart';
+import '../../home_screen/view/home_screen.dart';
 import 'dart:ui' as ui;
 
 class DetailScreen extends StatelessWidget {
@@ -23,6 +25,10 @@ class DetailScreen extends StatelessWidget {
         Provider.of<HomeScreenProvider>(context, listen: false);
     var homeScreenProvideTrue =
         Provider.of<HomeScreenProvider>(context, listen: true);
+    var detailScreenProviderTrue =
+        Provider.of<DetailScreenProvider>(context, listen: true);
+    var detailScreenProviderFalse =
+        Provider.of<DetailScreenProvider>(context, listen: false);
     var gitaProvider = Provider.of<GitaProvider>(context);
     var height = MediaQuery.of(context).size.height;
     var width = MediaQuery.of(context).size.width;
@@ -40,24 +46,47 @@ class DetailScreen extends StatelessWidget {
             size: 30,
           ),
         ),
-        title: Text(translate[homeScreenProvideTrue.languageIndex]),
+        title: Text(
+          (detailScreenProviderTrue.selectedLanguage == 'Sanskrit')
+              ? gitaProvider.gitaModalList[selectedIndex].chapterName.sanskrit
+              : (detailScreenProviderTrue.selectedLanguage == 'Hindi')
+                  ? gitaProvider.gitaModalList[selectedIndex].chapterName.hindi
+                  : (detailScreenProviderTrue.selectedLanguage == 'English')
+                      ? gitaProvider
+                          .gitaModalList[selectedIndex].chapterName.english
+                      : gitaProvider
+                          .gitaModalList[selectedIndex].chapterName.gujarati,
+        ),
         actions: [
-          Padding(
-            padding: const EdgeInsets.only(
-              right: 15.0,
-            ),
-            child: Consumer<HomeScreenProvider>(
-              builder: (context, value, child) => InkWell(
-                onTap: () {
-                  homeScreenProviderFalse.translateLanguage();
-                },
-                child: const Icon(
-                  Icons.translate,
-                  size: 30,
-                ),
-              ),
-            ),
+          DropdownButton(
+            value: detailScreenProviderTrue.selectedLanguage,
+            onChanged: (String? value) {
+              detailScreenProviderFalse.languageTranslate(value!);
+            },
+            items: <String>['Sanskrit', 'Hindi', 'English', 'Gujarati']
+                .map<DropdownMenuItem<String>>((String value) {
+              return DropdownMenuItem<String>(
+                value: value,
+                child: Text(value),
+              );
+            }).toList(),
           ),
+          // Padding(
+          //   padding: const EdgeInsets.only(
+          //     right: 15.0,
+          //   ),
+          //   child: Consumer<HomeScreenProvider>(
+          //     builder: (context, value, child) => InkWell(
+          //       onTap: () {
+          //         homeScreenProviderFalse.translateLanguage();
+          //       },
+          //       child: const Icon(
+          //         Icons.translate,
+          //         size: 30,
+          //       ),
+          //     ),
+          //   ),
+          // ),
         ],
       ),
       body: Container(
@@ -83,6 +112,7 @@ class DetailScreen extends StatelessWidget {
                     index: index,
                     homeScreenProviderTrue: homeScreenProvideTrue,
                     context: context,
+                    detailScreenProviderTrue: detailScreenProviderTrue,
                   ),
                 ),
               ],
@@ -100,6 +130,7 @@ class DetailScreen extends StatelessWidget {
     required int index,
     required HomeScreenProvider homeScreenProviderTrue,
     required context,
+    required DetailScreenProvider detailScreenProviderTrue,
   }) {
     return Container(
       margin: const EdgeInsets.only(bottom: 10),
@@ -114,13 +145,13 @@ class DetailScreen extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           SelectableText(
-            (homeScreenProviderTrue.languageIndex == 0)
+            (detailScreenProviderTrue.selectedLanguage == 'Sanskrit')
                 ? gitaProvider.gitaModalList[selectedIndex].verses[index]
                     .language.sanskrit
-                : (homeScreenProviderTrue.languageIndex == 1)
+                : (detailScreenProviderTrue.selectedLanguage == 'Hindi')
                     ? gitaProvider.gitaModalList[selectedIndex].verses[index]
                         .language.hindi
-                    : (homeScreenProviderTrue.languageIndex == 2)
+                    : (detailScreenProviderTrue.selectedLanguage == 'English')
                         ? gitaProvider.gitaModalList[selectedIndex]
                             .verses[index].language.english
                         : gitaProvider.gitaModalList[selectedIndex]
@@ -140,6 +171,8 @@ class DetailScreen extends StatelessWidget {
             children: [
               IconButton(
                 onPressed: () {
+                  Random random = Random();
+                  int x = random.nextInt(imageList.length);
                   showDialog(
                     context: context,
                     builder: (context) => Dialog.fullscreen(
@@ -154,44 +187,91 @@ class DetailScreen extends StatelessWidget {
                                 padding: const EdgeInsets.all(15.0),
                                 alignment: Alignment.center,
                                 width: double.infinity,
-                                decoration: const BoxDecoration(
+                                decoration: BoxDecoration(
                                   image: DecorationImage(
                                     fit: BoxFit.cover,
-                                    image: AssetImage('assets/img/bg2.jpg'),
+                                    image: AssetImage(imageList[x]),
                                   ),
                                 ),
-                                child: Text(
-                                  (homeScreenProviderTrue.languageIndex == 0)
-                                      ? gitaProvider
-                                          .gitaModalList[selectedIndex]
-                                          .verses[index]
-                                          .language
-                                          .sanskrit
-                                      : (homeScreenProviderTrue.languageIndex ==
-                                              1)
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Text(
+                                      (detailScreenProviderTrue
+                                                  .selectedLanguage ==
+                                              'Sanskrit')
+                                          ? gitaProvider
+                                              .gitaModalList[selectedIndex]
+                                              .chapterName
+                                              .sanskrit
+                                          : (detailScreenProviderTrue
+                                                      .selectedLanguage ==
+                                                  'Hindi')
+                                              ? gitaProvider
+                                                  .gitaModalList[selectedIndex]
+                                                  .chapterName
+                                                  .hindi
+                                              : (detailScreenProviderTrue
+                                                          .selectedLanguage ==
+                                                      'English')
+                                                  ? gitaProvider
+                                                      .gitaModalList[
+                                                          selectedIndex]
+                                                      .chapterName
+                                                      .english
+                                                  : gitaProvider
+                                                      .gitaModalList[
+                                                          selectedIndex]
+                                                      .chapterName
+                                                      .gujarati,
+                                      style: const TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 28,
+                                        color: Colors.white,
+                                      ),
+                                    ),
+                                    SizedBox(
+                                      height: height * 0.03,
+                                    ),
+                                    Text(
+                                      (detailScreenProviderTrue
+                                                  .selectedLanguage ==
+                                              'Sanskrit')
                                           ? gitaProvider
                                               .gitaModalList[selectedIndex]
                                               .verses[index]
                                               .language
-                                              .hindi
-                                          : (homeScreenProviderTrue
-                                                      .languageIndex ==
-                                                  2)
+                                              .sanskrit
+                                          : (detailScreenProviderTrue
+                                                      .selectedLanguage ==
+                                                  'Hindi')
                                               ? gitaProvider
                                                   .gitaModalList[selectedIndex]
                                                   .verses[index]
                                                   .language
-                                                  .english
-                                              : gitaProvider
-                                                  .gitaModalList[selectedIndex]
-                                                  .verses[index]
-                                                  .language
-                                                  .gujarati,
-                                  style: const TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 28,
-                                    color: Colors.white,
-                                  ),
+                                                  .hindi
+                                              : (detailScreenProviderTrue
+                                                          .selectedLanguage ==
+                                                      'English')
+                                                  ? gitaProvider
+                                                      .gitaModalList[
+                                                          selectedIndex]
+                                                      .verses[index]
+                                                      .language
+                                                      .english
+                                                  : gitaProvider
+                                                      .gitaModalList[
+                                                          selectedIndex]
+                                                      .verses[index]
+                                                      .language
+                                                      .gujarati,
+                                      style: const TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 28,
+                                        color: Colors.white,
+                                      ),
+                                    ),
+                                  ],
                                 ),
                               ),
                             ),
@@ -241,6 +321,14 @@ class DetailScreen extends StatelessWidget {
                                   Uint8List img =
                                       byteData!.buffer.asUint8List();
 
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(
+                                      behavior: SnackBarBehavior.floating,
+                                      margin: EdgeInsets.all(10),
+                                      content: Text('Saved to the gallery!'),
+                                    ),
+                                  );
+
                                   ImageGallerySaver.saveImage(img);
                                 },
                                 icon: const Icon(
@@ -275,6 +363,13 @@ class DetailScreen extends StatelessWidget {
                                     .verses[index].language.english
                                 : gitaProvider.gitaModalList[selectedIndex]
                                     .verses[index].language.gujarati,
+                  );
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      behavior: SnackBarBehavior.floating,
+                      margin: EdgeInsets.all(10),
+                      content: Text('Copied to clipboard'),
+                    ),
                   );
                 },
                 icon: const Icon(

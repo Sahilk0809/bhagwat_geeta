@@ -1,5 +1,6 @@
 import 'package:bhagwat_geeta/provider/shloks_provider.dart';
 import 'package:bhagwat_geeta/routes/routes.dart';
+import 'package:bhagwat_geeta/screens/detail_screen/provider/detail_screen_provider.dart';
 import 'package:bhagwat_geeta/screens/home_screen/provider/home_screen_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -14,6 +15,9 @@ void main() {
         ),
         ChangeNotifierProvider(
           create: (context) => HomeScreenProvider(),
+        ),
+        ChangeNotifierProvider(
+          create: (context) => DetailScreenProvider(),
         ),
       ],
       child: const MyApp(),
