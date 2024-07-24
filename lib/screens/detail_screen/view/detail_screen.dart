@@ -92,10 +92,10 @@ class DetailScreen extends StatelessWidget {
       body: Container(
         height: double.infinity,
         width: double.infinity,
-        decoration: const BoxDecoration(
+        decoration: BoxDecoration(
           image: DecorationImage(
             fit: BoxFit.cover,
-            image: AssetImage('assets/img/gita2.jpg'),
+            image: AssetImage(imageListOfChapters[selectedIndex]),
           ),
         ),
         child: Padding(
@@ -103,6 +103,17 @@ class DetailScreen extends StatelessWidget {
           child: SingleChildScrollView(
             child: Column(
               children: [
+                // SizedBox(
+                //   height: height * 0.4,
+                //   width: width,
+                //   child: Image.asset(
+                //     'assets/img/gita3.png',
+                //     fit: BoxFit.cover,
+                //   ),
+                // ),
+                // SizedBox(
+                //   height: height * 0.02,
+                // ),
                 ...List.generate(
                   verses.length,
                   (index) => shloksContainer(
@@ -352,13 +363,14 @@ class DetailScreen extends StatelessWidget {
               IconButton(
                 onPressed: () {
                   FlutterClipboard.copy(
-                    (homeScreenProviderTrue.languageIndex == 0)
+                    (detailScreenProviderTrue.selectedLanguage == 'Sanskrit')
                         ? gitaProvider.gitaModalList[selectedIndex]
                             .verses[index].language.sanskrit
-                        : (homeScreenProviderTrue.languageIndex == 1)
+                        : (detailScreenProviderTrue.selectedLanguage == 'Hindi')
                             ? gitaProvider.gitaModalList[selectedIndex]
                                 .verses[index].language.hindi
-                            : (homeScreenProviderTrue.languageIndex == 2)
+                            : (detailScreenProviderTrue.selectedLanguage ==
+                                    'English')
                                 ? gitaProvider.gitaModalList[selectedIndex]
                                     .verses[index].language.english
                                 : gitaProvider.gitaModalList[selectedIndex]
