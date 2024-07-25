@@ -21,8 +21,6 @@ class DetailScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    var homeScreenProviderFalse =
-        Provider.of<HomeScreenProvider>(context, listen: false);
     var homeScreenProvideTrue =
         Provider.of<HomeScreenProvider>(context, listen: true);
     var detailScreenProviderTrue =
