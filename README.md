@@ -17,5 +17,7 @@ Bhagavad Gita Wisdom is a user-friendly mobile app that brings the timeless teac
 <img src="https://github.com/user-attachments/assets/06daa2c1-f5ae-499b-a404-e09927789fa0" height=65% width="22%">
 <img src="https://github.com/user-attachments/assets/caf7baf7-4b46-4a52-8208-96fcc6507880" height=65% width="22%">
 
+<a href="https://github.com/Sahilk0809/bhagwat_gita/tree/master/lib"> Click here for the source code. </a>
+
 
 https://github.com/user-attachments/assets/06d59543-ba41-4ab2-98cc-20f45896bc62
